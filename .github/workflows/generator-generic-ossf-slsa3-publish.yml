@@ -1,0 +1,154 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+# This workflow lets you generate SLSA provenance file for your project.
+# The generation satisfies level 3 for the provenance requirements - see https://slsa.dev/spec/v0.1/requirements
+# The project is an initiative of the OpenSSF (openssf.org) and is developed at
+# https://github.com/slsa-framework/slsa-github-generator.
+# The provenance file can be verified using https://github.com/slsa-framework/slsa-verifier.
+# For more information about SLSA and how it improves the supply-chain, visit slsa.dev.
+
+name: SLSA generic generator
+on:
+  workflow_dispatch:
+  release:
+    types: [created]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      digests: ${{ steps.hash.outputs.digests }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # ========================================================
+      #
+      # Step 1: Build your artifacts.
+      #
+      # ========================================================
+      - name: Build artifacts
+        run: |
+            # These are some amazing artifacts.
+            echo "artifact1" > artifact1
+            echo "artifact2" > artifact2
+
+      # ========================================================
+      #
+      # Step 2: Add a step to generate the provenance subjects
+      #         as shown below. Update the sha256 sum arguments
+      #         to include all binaries that you generate
+      #         provenance for.
+      #
+      # ========================================================
+      - name: Generate subject for provenance
+        id: hash
+        run: |
+          set -euo pipefail
+
+          # List the artifacts the provenance will refer to.
+          files=$(ls artifact*)
+          # Generate the subjects (base64 encoded).
+          echo "hashes=$(sha256sum $files | base64 -w0)" >> "${GITHUB_OUTPUT}"
+
+  provenance:
+    needs: [build]
+    permissions:
+      actions: read   # To read the workflow path.
+      id-token: write # To sign the provenance.
+      contents: write # To add assets to a release.
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v1.4.0
+    with:
+      base64-subjects: "${{ needs.build.outputs.digests }}"
+      upload-assets: true # Optional: Upload to a new release
+
+<!DOCTYPE html>
+</section>
+
+
+<aside class="sidebar">
+<div class="sidebar-section">
+<h4>Les plus lus</h4>
+<ul>
+<li><a href="#">Article le plus lu 1</a></li>
+<li><a href="#">Article le plus lu 2</a></li>
+<li><a href="#">Article le plus lu 3</a></li>
+</ul>
+</div>
+<div class="sidebar-section">
+<h4>Opinions</h4>
+<ul>
+<li><a href="#">Tribune libre 1</a></li>
+<li><a href="#">Tribune libre 2</a></li>
+</ul>
+</div>
+<div class="sidebar-section">
+<h4>Podcasts</h4>
+<ul>
+<li><a href="#">Podcast 1</a></li>
+<li><a href="#">Podcast 2</a></li>
+</ul>
+</div>
+</aside>
+</div>
+
+
+<section class="dossiers">
+<h2>Dossiers & Enquêtes</h2>
+<div class="dossier-cards">
+<div class="dossier-card">
+<img src="images/dossier1.jpg" />
+<div class="content">
+<h4>Dossier 1</h4>
+<p>Résumé court du dossier approfondi pour captiver le lecteur.</p>
+</div>
+</div>
+<div class="dossier-card">
+<img src="images/dossier2.jpg" />
+<div class="content">
+<h4>Dossier 2</h4>
+<p>Résumé court du dossier approfondi pour captiver le lecteur.</p>
+</div>
+</div>
+<div class="dossier-card">
+<img src="images/dossier3.jpg" />
+<div class="content">
+<h4>Dossier 3</h4>
+<p>Résumé court du dossier approfondi pour captiver le lecteur.</p>
+</div>
+</div>
+</div>
+</section>
+
+
+<section class="selection">
+<h2>Sélection de la rédaction</h2>
+<div class="selection-cards">
+<div class="selection-card">
+<img src="images/selection1.jpg" />
+<div class="content">
+<h4>Article recommandé 1</h4>
+<p>Résumé court pour mettre en avant cet article sélectionné par la rédaction.</p>
+</div>
+</div>
+<div class="selection-card">
+<img src="images/selection2.jpg" />
+<div class="content">
+<h4>Article recommandé 2</h4>
+<p>Résumé court pour mettre en avant cet article sélectionné par la rédaction.</p>
+</div>
+</div>
+<div class="selection-card">
+<img src="images/selection3.jpg" />
+<div class="content">
+<h4>Article recommandé 3</h4>
+<p>Résumé court pour mettre en avant cet article sélectionné par la rédaction.</p>
+</div>
+</div>
+</div>
+</section>
+</body>
+</html>
